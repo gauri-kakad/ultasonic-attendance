@@ -1,15 +1,13 @@
 const mongoose = require('mongoose');
 
-const MONGO_URI = process.env.MONGODB_URI;
+const MONGO_URI = process.env.MONGODB_URL;
 
 const connectDB = async () => {
-  // 🚨 Fail fast if env variable is missing
   if (!MONGO_URI) {
-    console.error('❌ MONGODB_URI is NOT defined');
+    console.error('❌ MONGODB_URL is NOT defined');
     process.exit(1);
   }
 
-  // 🔍 Debug log (remove later if you want)
   console.log('Using Mongo URI:', MONGO_URI);
 
   const options = {
@@ -33,14 +31,12 @@ const connectDB = async () => {
         return connect(attempt + 1);
       }
 
-      console.error('All retry attempts failed. Exiting.');
       process.exit(1);
     }
   };
 
   await connect();
 
-  // 🔁 Reconnect logic
   mongoose.connection.on('disconnected', () => {
     console.warn('MongoDB Disconnected. Reconnecting...');
     setTimeout(() => connect(), 3000);
